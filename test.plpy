@@ -1,0 +1,4 @@
+wypisz("Witaj świecie")
+
+jeśli(1):
+    wypisz("Działa")
