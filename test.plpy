@@ -1,4 +1,10 @@
-wypisz("Witaj świecie")
-
-jeśli(1):
-    wypisz("Działa")
+wypisz("Witaj swiecie")
+jesli(wartosc_bezwzgledna(143) == 1):
+    wypisz("Dziala")
+        Falsz
+            zaimportuj
+    wypisz("Witaj swiecie")
+    jesli(wartosc_bezwzgledna(143) == 1):
+        wypisz("Dziala")
+        Falsz
+            zaimportuj

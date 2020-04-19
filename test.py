@@ -10,6 +10,7 @@ import pycparser.ply.lex as lex
 keyword_list = keywords.keywords_dictionary
 build_ins = build_in_functions.build_in_functions
 reserved_words = {**keyword_list, **build_ins}
+stack = [0]
 
 tokens = [
     'STRING',
@@ -39,12 +40,14 @@ tokens = [
     'ATEQUAL',
     'ELLIPSIS',
     'COLONEQUAL',
-    'NEWLINE'
+    'NEWLINE',
+    'INDENT',
+    'DEDENT'
 ]
 
 tokens = tokens + list(reserved_words.values())
 
-literals = [ '+','-','*','/','(',')','[', ']', '.', ',', ':', ';', '|', '&', '<', '>', '=', '%', '{', '}', '~', '^', '@', ]
+literals = ['+', '-', '*', '/', '(', ')', '[', ']', '.', ',', ':', ';', '|', '&', '<', '>', '=', '%', '{', '}', '~', '^', '@', ]
 
 t_NEWLINE = r'\n'
 t_EQEQUAL = r'\=\='
@@ -71,43 +74,88 @@ t_ATEQUAL = r'\@\='
 t_ELLIPSIS = r'\.\.\.'
 t_COLONEQUAL = r'\:\='
 
+
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
-    t.type = reserved_words.get(t.value,'ID')    # Check for reserved words
+    t.type = reserved_words.get(t.value, 'ID')    # Check for reserved words
     return t
+
 
 def t_STRING(t):
     r'"([^"\n]|(\\"))*"'
     t.value = str(t.value)
     return t
 
+
 def t_VAR(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     return t
 
+
 def t_NUMBER(t):
     r'[0-9]+\.?[0-9]*'
-    if('\.' in t.value):
+    if '\.' in t.value:
         t.value = float(t.value)
     else:
         t.value = int(t.value)
     return t
 
-t_ignore = ' \t\r'
+
+def t_INDENT(t):
+    r'\n[ ]*'
+    ile = len(t.value) - 1
+    if ile % 4 != 0:
+        return None
+    if ile == stack[-1] + 4:
+        stack.append(ile)
+        return t
+    elif ile == stack[-1]:
+        return None
+    elif ile < stack[-1]:
+        t.type = 'DEDENT'
+        to_return = []
+        while stack[-1] != ile:
+            stack.pop()
+            to_return.append(t)
+        return tuple(to_return)
+
+
+
+def t_DEDENT(t):
+    r'\n$'
+    ile = len(t.value) - 1
+    while stack[-1] != ile:
+        stack.pop()
+    return t
+
+
+t_ignore = ' \r'
+
 
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
 
-lexer = lex.lex()
 
-data = r'wypisz("Witaj swiecie")    jesli(wartosc_bezwzgledna(1) == 1):    wypisz("Dziala") Falsz zaimportuj'
+lexer = lex.lex(optimize=1)
 
-print("Data: '%s'" % data)
+# data = r"""wypisz("Witaj swiecie")
+# jesli(wartosc_bezwzgledna(143) == 1):
+#     wypisz("Dziala")
+# Falsz
+#     zaimportuj"""
+with open('test.plpy') as f:
+    data = f.read()
+print("Data: '%s'" % repr(data))
 
 lexer.input(data)
 
 while True:
     tok = lexer.token()
-    if not tok: break
-    print(tok)
+    if not tok:
+        break
+    if isinstance(tok, tuple):
+        for token in tok:
+            print(token)
+    else:
+        print(tok)
