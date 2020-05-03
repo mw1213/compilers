@@ -3,9 +3,8 @@ import keywords
 import parser
 import sys
 
-if ".." not in sys.path: sys.path.insert(0,"..")
-import pycparser.ply.lex as lex
-
+if ".." not in sys.path: sys.path.insert(0, "..")
+import ply.lex as lex
 
 keyword_list = keywords.keywords_dictionary
 build_ins = build_in_functions.build_in_functions
@@ -47,7 +46,8 @@ tokens = [
 
 tokens = tokens + list(reserved_words.values())
 
-literals = ['+', '-', '*', '/', '(', ')', '[', ']', '.', ',', ':', ';', '|', '&', '<', '>', '=', '%', '{', '}', '~', '^', '@', ]
+literals = ['+', '-', '*', '/', '(', ')', '[', ']', '.', ',', ':', ';', '|', '&', '<', '>', '=', '%', '{', '}', '~',
+            '^', '@', ]
 
 t_NEWLINE = r'\n'
 t_EQEQUAL = r'\=\='
@@ -77,7 +77,7 @@ t_COLONEQUAL = r'\:\='
 
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
-    t.type = reserved_words.get(t.value, 'ID')    # Check for reserved words
+    t.type = reserved_words.get(t.value, 'ID')  # Check for reserved words
     return t
 
 
@@ -110,7 +110,8 @@ def t_INDENT(t):
         stack.append(ile)
         return t
     elif ile == stack[-1]:
-        return None
+        t.type = "NEWLINE"
+        return t
     elif ile < stack[-1]:
         t.type = 'DEDENT'
         to_return = []
@@ -118,7 +119,6 @@ def t_INDENT(t):
             stack.pop()
             to_return.append(t)
         return tuple(to_return)
-
 
 
 def t_DEDENT(t):
@@ -146,16 +146,35 @@ lexer = lex.lex(optimize=1)
 #     zaimportuj"""
 with open('test.plpy') as f:
     data = f.read()
-print("Data: '%s'" % repr(data))
+#print("Data: '%s'" % repr(data))
 
 lexer.input(data)
+
+result = ""
 
 while True:
     tok = lexer.token()
     if not tok:
         break
+    # if isinstance(tok, tuple):
+    #     for token in tok:
+    #         print(token)
+    # else:
+    #     print(tok)
     if isinstance(tok, tuple):
-        for token in tok:
-            print(token)
+        spaces = ""
+        for i in range(len(stack)-1):
+            spaces+= "    "
+        result+="\n"+spaces
     else:
-        print(tok)
+        if(tok.value in keyword_list or tok.value in build_ins):
+            result += tok.type
+        elif(tok.type == "NEWLINE"):
+            result += tok.value
+        else:
+            result += str(tok.value)
+
+print(result)
+f = open("resultfile.py", "w")
+f.write(result)
+f.close()
