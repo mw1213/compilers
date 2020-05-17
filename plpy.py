@@ -112,9 +112,12 @@ def t_INDENT(t):
     ile = len(t.value) - 1
     if ile % 4 != 0:
         return None
-    if ile == stack[-1] + 4:
-        stack.append(ile)
-        return t
+    if ile > stack[-1]:
+        to_return = []
+        while stack[-1] != ile:
+            stack.append(stack[-1]+4)
+            to_return.append(t)
+        return tuple(to_return)
     elif ile == stack[-1]:
         t.type = "NEWLINE"
         return t
@@ -125,6 +128,7 @@ def t_INDENT(t):
             stack.pop()
             to_return.append(t)
         return tuple(to_return)
+
 
 
 def t_DEDENT(t):
@@ -170,14 +174,16 @@ for file_path in args.strings:
             result += "\n" + spaces
         else:
             if tok.value in keyword_list or tok.value in build_ins:
-                result += tok.type
+                if len(result) > 0 and result[len(result) - 1] != " " and result[len(result) - 1] != "\n":
+                    result += " "
+                result += tok.type + " "
             elif tok.type == "NEWLINE":
                 result += tok.value
             else:
                 result += str(tok.value)
-    # print(result)
+
     # run file with exec or save result to py file if -f/--file argument is provided
-    # for example: python test.py test_pl.plpy --file
+    # for example: python plpy.py test_pl.plpy --file
     if args.file:
         f = open(f"{output_name}.py", "w")
         f.write(result)
