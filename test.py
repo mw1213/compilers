@@ -1,10 +1,16 @@
 import build_in_functions
 import keywords
-import parser
 import sys
+import argparse
 
 if ".." not in sys.path: sys.path.insert(0, "..")
 import ply.lex as lex
+
+parser = argparse.ArgumentParser(description='Parsing pypl scripts...')
+parser.add_argument('strings', metavar='file_name', type=str, nargs='+',
+                    help='File names to parse')
+parser.add_argument('-f', '--file', help='save to file', action='store_true')
+args = parser.parse_args()
 
 keyword_list = keywords.keywords_dictionary
 build_ins = build_in_functions.build_in_functions
@@ -139,42 +145,43 @@ def t_error(t):
 
 lexer = lex.lex(optimize=1)
 
-# data = r"""wypisz("Witaj swiecie")
-# jesli(wartosc_bezwzgledna(143) == 1):
-#     wypisz("Dziala")
-# Falsz
-#     zaimportuj"""
-with open('test.plpy') as f:
-    data = f.read()
-#print("Data: '%s'" % repr(data))
+for file_path in args.strings:
+    try:
+        with open(file_path) as f:
+            data = f.read()
+    except FileNotFoundError:
+        print(f"There is no such file: {file_path}")
+        continue
+    output_name = file_path.split(".")[0]
+    #print("Data: '%s'" % repr(data))
 
-lexer.input(data)
+    lexer.input(data)
 
-result = ""
+    result = """"""
 
-while True:
-    tok = lexer.token()
-    if not tok:
-        break
-    # if isinstance(tok, tuple):
-    #     for token in tok:
-    #         print(token)
-    # else:
-    #     print(tok)
-    if isinstance(tok, tuple):
-        spaces = ""
-        for i in range(len(stack)-1):
-            spaces+= "    "
-        result+="\n"+spaces
-    else:
-        if(tok.value in keyword_list or tok.value in build_ins):
-            result += tok.type
-        elif(tok.type == "NEWLINE"):
-            result += tok.value
+    while True:
+        tok = lexer.token()
+        if not tok:
+            break
+        if isinstance(tok, tuple):
+            spaces = ""
+            for i in range(len(stack)-1):
+                spaces += "    "
+            result += "\n" + spaces
         else:
-            result += str(tok.value)
+            if tok.value in keyword_list or tok.value in build_ins:
+                result += tok.type
+            elif tok.type == "NEWLINE":
+                result += tok.value
+            else:
+                result += str(tok.value)
+    # print(result)
+    # run file with exec or save result to py file if -f/--file argument is provided
+    # for example: python test.py test_pl.plpy --file
+    if args.file:
+        f = open(f"{output_name}.py", "w")
+        f.write(result)
+        f.close()
+    else:
+        exec(result)
 
-print(result)
-f = open("resultfile.py", "w")
-f.write(result)
-f.close()
