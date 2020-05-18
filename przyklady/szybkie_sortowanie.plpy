@@ -1,0 +1,35 @@
+definicja podzial(tablica, poczatek, koniec):
+    punkt_podzialu = tablica[poczatek]
+    dol = poczatek + 1
+    gora = koniec
+
+    w_trakcie Prawda:
+        w_trakcie dol <= gora i tablica[gora] >= punkt_podzialu:
+            gora = gora - 1
+
+        w_trakcie dol <= gora i tablica[dol] <= punkt_podzialu:
+            dol = dol + 1
+
+        jesli dol <= gora:
+            tablica[dol], tablica[gora] = tablica[gora], tablica[dol]
+        albo:
+            przerwij
+
+    tablica[poczatek], tablica[gora] = tablica[gora], tablica[poczatek]
+
+    zwroc gora
+
+
+definicja szybkie_sortowanie(tablica, poczatek, koniec):
+    jesli poczatek >= koniec:
+        zwroc
+
+    p = podzial(tablica, poczatek, koniec)
+    szybkie_sortowanie(tablica, poczatek, p-1)
+    szybkie_sortowanie(tablica, p+1, koniec)
+
+
+tablica = [2,96,57,41,7,28,44,78,87,96,31,76,55,44,2,97,12,21,44,0,12,51,88,22,11,73,16]
+
+szybkie_sortowanie(tablica, 0, dlugosc(tablica) - 1)
+wypisz(tablica)

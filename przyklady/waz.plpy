@@ -1,0 +1,122 @@
+zaimportuj pygame
+zaimportuj random
+
+pygame.init()
+
+czerwony = (213, 50, 80)
+zielony = (0, 255, 0)
+niebieski = (50, 153, 213)
+bialy = (255, 255, 255)
+zolty = (255, 255, 102)
+czarny = (0, 0, 0)
+
+szerokosc_ekranu = 600
+wysokosc_ekranu = 400
+
+ekran = pygame.display.set_mode((szerokosc_ekranu, wysokosc_ekranu))
+pygame.display.set_caption("Wąż")
+
+zegar = pygame.time.Clock()
+
+waz = 10
+waz_szybkosc = 15
+
+czcionka = pygame.font.SysFont("bahnschrift", 25)
+
+definicja wynik(score):
+    wartosc = czcionka.render("Twoj wynik: " + str(score), Prawda, zolty)
+    ekran.blit(wartosc, [0, 0])
+
+
+definicja nasz_waz(waz, waz_lista):
+    dla x w waz_lista:
+        pygame.draw.rect(ekran, czarny, [int(x[0]), int(x[1]), waz, waz])
+
+
+definicja wiadomosc(tresc, kolor):
+    render = czcionka.render(tresc, True, kolor)
+    ekran.blit(render, [int(szerokosc_ekranu / 6), int(wysokosc_ekranu / 3)])
+
+
+definicja gra():
+    koniec_gry = Falsz
+    zamkniecie = Falsz
+
+    x1 = szerokosc_ekranu / 2
+    y1 = wysokosc_ekranu / 2
+
+    x1_zmiana = 0
+    y1_zmiana = 0
+
+    waz_lista = []
+    dlugosc_weza = 1
+
+    punktX = zaokraglij(random.randrange(0, szerokosc_ekranu - waz) / 10) * 10
+    punktY = zaokraglij(random.randrange(0, wysokosc_ekranu - waz) / 10) * 10
+
+    w_trakcie nie koniec_gry:
+
+        w_trakcie zamkniecie == Prawda:
+            ekran.fill(niebieski)
+            wiadomosc("Spacja - Jeszcze raz  Q - Wyjscie", czerwony)
+            wynik(dlugosc_weza - 1)
+            pygame.display.update()
+
+            dla event w pygame.event.get():
+                jesli event.type == pygame.KEYDOWN:
+                    jesli event.key == pygame.K_q:
+                        koniec_gry = Prawda
+                        zamkniecie = Falsz
+                    jesli event.key == pygame.K_SPACE:
+                        gra()
+
+        dla event w pygame.event.get():
+            jesli event.type == pygame.QUIT:
+                koniec_gry = Prawda
+            jesli event.type == pygame.KEYDOWN:
+                jesli event.key == pygame.K_LEFT:
+                    x1_zmiana = -waz
+                    y1_zmiana = 0
+                albo_jesli event.key == pygame.K_RIGHT:
+                    x1_zmiana = waz
+                    y1_zmiana = 0
+                albo_jesli event.key == pygame.K_UP:
+                    y1_zmiana = -waz
+                    x1_zmiana = 0
+                albo_jesli event.key == pygame.K_DOWN:
+                    y1_zmiana = waz
+                    x1_zmiana = 0
+
+        jesli x1 >= szerokosc_ekranu lub x1 < 0 lub y1 >= wysokosc_ekranu lub y1 < 0:
+            zamkniecie = Prawda
+        x1 += x1_zmiana
+        y1 += y1_zmiana
+        ekran.fill(niebieski)
+        pygame.draw.rect(ekran, zielony, [int(punktX), int(punktY), waz, waz])
+        glowa_weza = []
+        glowa_weza.append(x1)
+        glowa_weza.append(y1)
+        waz_lista.append(glowa_weza)
+        jesli dlugosc(waz_lista) > dlugosc_weza:
+            usun waz_lista[0]
+
+        dla x w waz_lista[:-1]:
+            jesli x == glowa_weza:
+                zamkniecie = Prawda
+
+        nasz_waz(waz, waz_lista)
+        wynik(dlugosc_weza - 1)
+
+        pygame.display.update()
+
+        jesli x1 == punktX i y1 == punktY:
+            punktX = zaokraglij(random.randrange(0, szerokosc_ekranu - waz) / 10) * 10
+            punktY = zaokraglij(random.randrange(0, wysokosc_ekranu - waz) / 10) * 10
+            dlugosc_weza += 1
+
+        zegar.tick(waz_szybkosc)
+
+    pygame.quit()
+    quit()
+
+gra()
