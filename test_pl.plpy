@@ -1,6 +1,13 @@
 wypisz("Witaj swiecie")
+"""JUHUHUHUHUHU
+I
+K
+KKdsa
+L"""
 jesli (wartosc_bezwzgledna(-143) == 143):
-    wypisz("Dziala")
+    wypisz("Dziala") #WITAMMMM
     wypisz("Witaj swiecie")
+    """dsa
+        dsamkdasmdkasmdals"""
     jesli (wartosc_bezwzgledna(143) == 1):
-        wypisz("Dziala")
+        wypisz("Dziala") #COM

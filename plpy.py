@@ -47,7 +47,8 @@ tokens = [
     'COLONEQUAL',
     'NEWLINE',
     'INDENT',
-    'DEDENT'
+    'DEDENT',
+    'COMMENT'
 ]
 
 tokens = tokens + list(reserved_words.values())
@@ -88,9 +89,30 @@ def t_ID(t):
 
 
 def t_STRING(t):
-    r'"([^"\n]|(\\"))*"'
-    t.value = str(t.value)
+    r'\"([^\\"]|(\\.))*\"'
+    escaped = 0
+    str1 = t.value[1:-1]
+    new_str = ""
+    for i in range(0, len(str1)):
+        c = str1[i]
+        if escaped:
+            if c == "n":
+                c = "\n"
+            elif c == "t":
+                c = "\t"
+            new_str += c
+            escaped = 0
+        else:
+            if c == "\\":
+                escaped = 1
+            else:
+                new_str += c
+    t.value = str(new_str)
     return t
+    # r'"([^"\n]|(\\"))*"'
+    # t.value = str(t.value)
+    # print(t)
+    # return t
 
 
 def t_VAR(t):
@@ -104,6 +126,11 @@ def t_NUMBER(t):
         t.value = float(t.value)
     else:
         t.value = int(t.value)
+    return t
+
+def t_COMMENT(t):
+    r'\#.*'
+    # pass
     return t
 
 
@@ -179,6 +206,8 @@ for file_path in args.strings:
                 result += tok.type + " "
             elif tok.type == "NEWLINE":
                 result += tok.value
+            elif tok.type == "STRING":
+                result += "\""+tok.value+"\""
             else:
                 result += str(tok.value)
 
