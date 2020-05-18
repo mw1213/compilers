@@ -14,7 +14,7 @@ szerokosc_ekranu = 600
 wysokosc_ekranu = 400
 
 ekran = pygame.display.set_mode((szerokosc_ekranu, wysokosc_ekranu))
-pygame.display.set_caption("Wąż")
+pygame.display.set_caption("Waz")
 
 zegar = pygame.time.Clock()
 
