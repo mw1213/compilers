@@ -42,6 +42,5 @@ python plpy.py przyklady/waz.plpy
 - przykłady użycia: **Robert Czarnik**
 - dodanie obsługi komentarzy: **Ewa Tabor**
 - poprawa obsługi string do działania na multiline: **Ewa Tabor**
-
-link do doku: 
-https://docs.google.com/document/d/14pQ0l4JekJbRhlgCLPLwhurmKZyAOBoZagdd3VvZrB8/edit?usp=sharing
+- przepisanie dokumentacji do README: **Maciej Wilk**
+- prezentacja: **Ewa Tabor, Maciej Wilk**
